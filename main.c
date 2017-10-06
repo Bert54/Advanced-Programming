@@ -3,7 +3,7 @@
 #include "game.h"
 
 int main (int argc, char* argv[]) {
-  char* file = "entry.txt";
+  char* file = "content/entry/entry.txt";
   gameInit(file);
   return EXIT_SUCCESS;
 }

@@ -4,6 +4,8 @@
 #include "entryReader.h"
 #include "game.h"
 #include "gameEvents.h"
+#include "scenePlacement.h"
+#include "characters.h"
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 1000
 
@@ -26,18 +28,64 @@ int gameInit(char* fileName) {
   return 1;
 }
 
-void mainGame(int* entree) {
-  int mainScreen = 1;
+void mainGame(int* entry) {
+  int mainScreen = 1, colorKey;
+  caseg gameGrid[20][20];
   SDL_Event eventGame;
-  SDL_Surface *screen;
+  SDL_Surface *screen, *surfaceLoader, *ground, *wall;
+  SDL_Rect posWall;
+  player player;
   SDL_Init(SDL_INIT_VIDEO);
   SDL_WM_SetCaption("A temporary name","A temporary name");
   screen = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
+  colorKey = SDL_MapRGB(screen->format, 255, 0, 255);
+  gameGridFiller(entry, gameGrid);
+  surfaceLoader = SDL_LoadBMP("content/scene/grass.bmp");
+  ground = SDL_DisplayFormat(surfaceLoader);
+  SDL_FreeSurface(surfaceLoader);
+  surfaceLoader = SDL_LoadBMP("content/scene/wall.bmp");
+  wall = SDL_DisplayFormat(surfaceLoader);
+  SDL_FreeSurface(surfaceLoader);
+  initPlayer(&player, entry, colorKey);
+  SDL_EnableKeyRepeat(1, 6);
   while (mainScreen) {
     if (SDL_PollEvent(&eventGame)) {
-      eventManager(eventGame, &mainScreen);
+      eventManager(eventGame, &mainScreen, &player, gameGrid);
     }
+    SDL_FillRect(screen,NULL,0x000000);
+    SDL_BlitSurface(ground, NULL, screen, NULL);
+    wallPlacement(entry, *screen, *wall, &posWall);
+    SDL_BlitSurface(player.skin, &(player.size), screen, &(player.position));
     SDL_UpdateRect(screen, 0, 0, 0, 0);
   }
+  freePlayer(&player);
+  SDL_FreeSurface(ground);
+  SDL_FreeSurface(wall);
   SDL_Quit();
+}
+
+void gameGridFiller(int* entry, caseg gameGrid[20][20]) {
+  int i = 0;
+  int j = 0;
+  int k = 0;
+  while(entry[i] != 3) {
+    switch (entry[i]) {
+    case 1:
+      gameGrid[j][k].inaccesibble = 1;
+      gameGrid[j][k].xvalue = j * 50;
+      gameGrid[j][k].yvalue = k * 50;
+      j++;
+      break;
+    case 2:
+      j = 0;
+      k++;
+      break;
+    default:
+      gameGrid[j][k].inaccesibble = 0;
+      gameGrid[j][k].xvalue = j * 50;
+      gameGrid[j][k].yvalue = k * 50;
+      j++;
+    }
+    i++;
+  }
 }

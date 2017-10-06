@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define ENTRY_SIZE 100
+#define ENTRY_SIZE 600
 
 int fileOpener(FILE** file, char* fileName) {
   *file = fopen(fileName,"r");
@@ -38,6 +38,9 @@ int* fileReader(FILE* file) {
       case '#':
 	content[i] = 1;
 	break;
+    case '0':
+      content[i] = 4;
+      break;
       case '\n':
 	content[i] = 2;
 	break;
