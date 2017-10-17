@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "SDL.h"
-#include "entryReader.h"
-#include "game.h"
-#include "gameEvents.h"
-#include "scenePlacement.h"
-#include "characters.h"
+#include "headers/entryReader.h"
+#include "headers/game.h"
+#include "headers/gameEvents.h"
+#include "headers/scenePlacement.h"
+#include "headers/characters.h"
+#include "headers/projectiles.h"
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 1000
 
@@ -35,6 +36,7 @@ void mainGame(int* entry) {
   SDL_Surface *screen, *surfaceLoader, *ground, *wall;
   SDL_Rect posWall;
   player player;
+  Projectiles* projectiles = malloc(sizeof(Projectiles));
   SDL_Init(SDL_INIT_VIDEO);
   SDL_WM_SetCaption("A temporary name","A temporary name");
   screen = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
@@ -48,17 +50,23 @@ void mainGame(int* entry) {
   SDL_FreeSurface(surfaceLoader);
   initPlayer(&player, entry, colorKey);
   SDL_EnableKeyRepeat(1, 6);
+  consEmptyProjectilesList(projectiles);
   while (mainScreen) {
+    if (player.curFireDelay > 0) {
+      player.curFireDelay--;
+    }
     if (SDL_PollEvent(&eventGame)) {
-      eventManager(eventGame, &mainScreen, &player, gameGrid);
+      eventManager(eventGame, &mainScreen, &player, gameGrid, projectiles, colorKey);
     }
     SDL_FillRect(screen,NULL,0x000000);
     SDL_BlitSurface(ground, NULL, screen, NULL);
     wallPlacement(entry, *screen, *wall, &posWall);
+    displayProjectiles(screen, projectiles, gameGrid);
     SDL_BlitSurface(player.skin, &(player.size), screen, &(player.position));
     SDL_UpdateRect(screen, 0, 0, 0, 0);
   }
   freePlayer(&player);
+  destroyProjectilesList(projectiles);
   SDL_FreeSurface(ground);
   SDL_FreeSurface(wall);
   SDL_Quit();

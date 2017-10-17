@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "SDL.h"
-#include "game.h"
-#include "characters.h"
+#include "headers/game.h"
+#include "headers/characters.h"
+#define DEFAULT_FIREDELAY 120
+#define DEFAULT_HEALTH 3
 
 void initPlayer (player* player, int* entry, int colorKey) {
   SDL_Surface *surfaceLoader = SDL_LoadBMP("content/character/player.bmp");
@@ -48,7 +50,9 @@ void initPlayer (player* player, int* entry, int colorKey) {
       i++;
     }
   }
-  player->health = 100;
+  player->health = DEFAULT_HEALTH;
+  player->fireDelay = DEFAULT_FIREDELAY;
+  player->curFireDelay = 0;
 }
 
 void freePlayer(player* player) {
@@ -88,7 +92,7 @@ int playerCollision (player* player, caseg grid[20][20], int dir) {
 	if (grid[j][i].inaccesibble == 1 && player->position.y+49 == grid[j][i].yvalue && player->position.x-10 >= grid[j][i].xvalue && player->position.x+10 <= grid[j][i].xvalue + 49) {
 	  return 1;
 	}
-	if (grid[j+1][i].inaccesibble == 1 && player->position.y+49 == grid[j+1][i].yvalue && player->position.x+38  >= grid[j+1][i].xvalue && player->position.x+38 <= grid[j+1][i].xvalue + 49) {
+	if (grid[j+1][i].inaccesibble == 1 && player->position.y+49 == grid[j+1][i].yvalue && player->position.x+40  >= grid[j+1][i].xvalue && player->position.x+40 <= grid[j+1][i].xvalue + 49) {
 	  return 1;
 	}
       }
