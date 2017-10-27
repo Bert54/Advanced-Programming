@@ -41,6 +41,7 @@ void mainGame(int* entry) {
   player player;
   Projectiles *projectiles = malloc(sizeof(Projectiles));
   Enemies *enemies = malloc(sizeof(Enemies));
+  DeadEnemies dEnemies = initDeadQueue(dEnemies);
   srand(time(NULL)); 
   SDL_Init(SDL_INIT_VIDEO);
   SDL_WM_SetCaption("Survival Shooter","Survival Shooter");
@@ -61,7 +62,7 @@ void mainGame(int* entry) {
   maxEnemies = DEFAULT_MAXENEMIES;
   spawnRate = DEFAULT_SPAWNRATE;
   while (mainScreen) {
-    projectileHit(enemies, &player, projectiles);
+    projectileHit(enemies, &player, projectiles, &dEnemies, colorKey);
     if (player.health <= 0)  {
       if (goCounter == 0) {
 	playerGameOverAnim(&player);
@@ -83,6 +84,9 @@ void mainGame(int* entry) {
     SDL_FillRect(screen,NULL,0x000000);
     SDL_BlitSurface(ground, NULL, screen, NULL);
     wallPlacement(entry, *screen, *wall, &posWall);
+    if (!dEnemies.empty) {
+      updateDeadQueue(screen, &dEnemies);
+    }
     if (player.health <= 0) {
       SDL_BlitSurface(player.skin, &(player.size), screen, &(player.position));
     }

@@ -36,9 +36,10 @@ struct __enemyCorpse {
 typedef struct __enemyCorpsesQueue DeadEnemies;
 
 struct __enemyCorpsesQueue {
-  DeadEnemy number[100];
+  DeadEnemy* number;
   int start;
   int end;
+  int empty;
 };
 
 #include "SDL.h"
@@ -55,9 +56,12 @@ void generateEnemy(Enemies* enemies, caseg grid[20][20], int spawnRate, int* nbE
 void displayEnemies(SDL_Surface* screen, Enemies* enemies, caseg grid[20][20], player* player, Projectiles* projectiles, int colorKey);
 void enemyCollision(Enemy* enemy, caseg grid[20][20]);
 int playerInSight(Enemy* enemy, player* player);
-void projectileHit(Enemies* enemies, player* player, Projectiles* projectiles);
+void projectileHit(Enemies* enemies, player* player, Projectiles* projectiles, DeadEnemies* dEnemies, int colorKey);
 void playerGameOverAnim(player* player);
 void destroyEnemy(Enemies* enemies, int position);
-void checkDeadEnemies(Enemies* enemies);
+void checkDeadEnemies(Enemies* enemies, DeadEnemies* dEnemies, int colorKey);
+DeadEnemies initDeadQueue();
+void alterDeadQueue(DeadEnemies* dEnemies, Enemy* enemy, int colorKey);
+void updateDeadQueue(SDL_Surface* screen, DeadEnemies* dEnemies);
 
 #endif

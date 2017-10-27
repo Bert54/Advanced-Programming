@@ -5,8 +5,9 @@
 #include "headers/game.h"
 #include "headers/characters.h"
 #include "headers/projectiles.h"
-#define DEFAULT_FIREDELAY 120
-#define DEFAULT_HEALTH 10
+#define DEFAULT_FIREDELAY 20
+#define DEFAULT_HEALTH 20
+#define CORPSES_LIMIT 100
 
 void initPlayer (player* player, int* entry, int colorKey) {
   SDL_Surface *surfaceLoader = SDL_LoadBMP("content/character/player.bmp");
@@ -318,7 +319,7 @@ int playerInSight(Enemy* enemy, player* player) {
 }
 
 
-void projectileHit(Enemies* enemies, player* player, Projectiles* projectiles) {
+void projectileHit(Enemies* enemies, player* player, Projectiles* projectiles, DeadEnemies* dEnemies, int colorKey) {
   Projectile* tempP = projectiles->first;
   int counterE, counterP = 1, hit;
   Enemy* tempE;
@@ -351,7 +352,7 @@ void projectileHit(Enemies* enemies, player* player, Projectiles* projectiles) {
     tempP = tempP->next;
     counterP++;
   }
-  checkDeadEnemies(enemies);
+  checkDeadEnemies(enemies, dEnemies, colorKey);
 }
 
 void playerGameOverAnim(player* player) {
@@ -398,11 +399,12 @@ void destroyEnemy(Enemies* enemies, int position) {
   }
 }
 
-void checkDeadEnemies(Enemies* enemies) {
+void checkDeadEnemies(Enemies* enemies, DeadEnemies* dEnemies, int colorKey) {
   Enemy* temp = enemies->first;
   int counter = 1;
   while (temp != NULL) {
     if (temp->health <= 0) {
+      alterDeadQueue(dEnemies, temp, colorKey);
       destroyEnemy(enemies, counter);
       counter--;
     }
@@ -410,3 +412,81 @@ void checkDeadEnemies(Enemies* enemies) {
     temp = temp->next;
   }
 }
+
+DeadEnemies initDeadQueue() {
+  DeadEnemies dEnemies;
+  dEnemies.number = malloc(CORPSES_LIMIT * sizeof(DeadEnemy));
+  dEnemies.start = 0;
+  dEnemies.end = 0;
+  dEnemies.empty = 1;
+  return dEnemies;
+}
+
+void alterDeadQueue(DeadEnemies* dEnemies, Enemy* enemy, int colorKey) {
+  dEnemies->end++;
+  if (dEnemies->end == CORPSES_LIMIT) {
+    dEnemies->end = 0;
+  }
+  if (dEnemies->start == CORPSES_LIMIT) {
+    dEnemies->start = 0;
+  }
+  if (dEnemies->start == dEnemies->end) {
+    SDL_FreeSurface(dEnemies->number[dEnemies->end].sprite);
+    dEnemies->start++;
+  }
+  SDL_Surface* surfaceLoader = SDL_LoadBMP("content/character/enemy1.bmp");
+  dEnemies->number[dEnemies->end].sprite = SDL_DisplayFormat(surfaceLoader);
+  SDL_FreeSurface(surfaceLoader);
+  SDL_SetColorKey(dEnemies->number[dEnemies->end].sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorKey);
+  dEnemies->number[dEnemies->end].position.x = enemy->position.x;
+  dEnemies->number[dEnemies->end].position.y = enemy->position.y;
+  dEnemies->number[dEnemies->end].animation.x = 0;
+  dEnemies->number[dEnemies->end].animation.y = 200;
+  dEnemies->number[dEnemies->end].animation.w = enemy->animation.w;
+  dEnemies->number[dEnemies->end].animation.h = enemy->animation.h;
+  dEnemies->number[dEnemies->end].animDelay = 20;
+  dEnemies->number[dEnemies->end].curAnimDelay = dEnemies->number[dEnemies->end].animDelay;
+  if (dEnemies->empty == 1) {
+    dEnemies->empty = 0;
+  }
+}
+
+void updateDeadQueue(SDL_Surface* screen, DeadEnemies* dEnemies) {
+  int start, end, counter;
+  if (dEnemies->start == dEnemies->end) {
+    while (counter < CORPSES_LIMIT) {
+      if (dEnemies->number[counter].animation.x < 150) {
+	if (dEnemies->number[counter].curAnimDelay == 0) {
+	  dEnemies->number[counter].animation.x += 50;
+	  dEnemies->number[counter].curAnimDelay = dEnemies->number[counter].animDelay;
+	}
+	else {
+	  dEnemies->number[counter].curAnimDelay--;
+	}
+      }
+      SDL_BlitSurface(dEnemies->number[counter].sprite, &(dEnemies->number[counter].animation), screen, &(dEnemies->number[counter].position));
+      counter++;
+    }
+  }
+  else {
+    start = dEnemies->start+1;
+    end = dEnemies->end+1;
+    while (start != end) {
+      if (start >= CORPSES_LIMIT) {
+	start = 0;
+      }
+      if (dEnemies->number[start].animation.x < 150) {
+	 if (dEnemies->number[start].curAnimDelay == 0) {
+	   dEnemies->number[start].animation.x += 50;
+	   dEnemies->number[start].curAnimDelay = dEnemies->number[start].animDelay;
+	 }
+	 else {
+	   dEnemies->number[start].curAnimDelay--;
+	 }
+      }
+      SDL_BlitSurface(dEnemies->number[start].sprite, &(dEnemies->number[start].animation), screen, &(dEnemies->number[start].position));
+      start++;
+    }
+  }
+}
+

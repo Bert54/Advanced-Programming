@@ -57,14 +57,15 @@ void consProjectilePlayer(Projectiles* projectile, int colorKey, player* player,
   temp->animation.h = PROJECTILE_HEIGHT;
   temp->spriteRate = 0;
   if (alliedTeam == 0) {
-    temp->velocity = 10;
+    temp->velocity = 30;
     temp->slow = 0;
+    temp->slowCount = 0;
   }
   else {
     temp->velocity = 20;
-    temp->slow = 3;
+    temp->slow = 4;
+    temp->slowCount = temp->slow;
   }
-    temp->slowCount = 0;
   temp->alliedTeam = alliedTeam;
   temp->direction = direction;
   temp->next = projectile->first;
