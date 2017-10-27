@@ -14,23 +14,23 @@ void eventManager(SDL_Event event, int *mainScreen, player* player, caseg grid[2
   if (keystates[SDLK_ESCAPE]) {
       eventQuit(mainScreen);
   }
-  if (keystates[SDLK_UP]) {
+  if (player->health > 0 && keystates[SDLK_UP]) {
       eventPlayerMovement(player, 0, grid);
   }
-  else if (keystates[SDLK_RIGHT]) {
+  else if (player->health > 0 && keystates[SDLK_RIGHT]) {
       eventPlayerMovement(player, 1, grid);
   }
-  else if (keystates[SDLK_DOWN]) {
+  else if (player->health > 0 && keystates[SDLK_DOWN]) {
       eventPlayerMovement(player, 2, grid);
   }
-  else if (keystates[SDLK_LEFT]) {
+  else if (player->health > 0 && keystates[SDLK_LEFT]) {
       eventPlayerMovement(player, 3, grid);
   }
-  if (keystates[SDLK_SPACE] && player->curFireDelay == 0) {
-      consProjectilePlayer(projectiles, colorKey, player, player->size.y / 50);
+  if (player->health > 0 && keystates[SDLK_SPACE] && player->curFireDelay == 0) {
+    consProjectilePlayer(projectiles, colorKey, player, player->size.y / 50, 0, NULL);
       player->curFireDelay = player->fireDelay;
   }
-  if (event.type == SDL_KEYUP) {
+  if (player->health > 0 && event.type == SDL_KEYUP) {
     switch (event.key.keysym.sym) {
     case SDLK_UP:
     case SDLK_RIGHT:

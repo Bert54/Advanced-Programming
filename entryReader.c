@@ -41,11 +41,14 @@ int* fileReader(FILE* file) {
     case '0':
       content[i] = 4;
       break;
-      case '\n':
-	content[i] = 2;
-	break;
-      default:
-	content[i] = 0;
+    case 'X':
+      content[i] = 5;
+      break;
+    case '\n':
+      content[i] = 2;
+      break;
+    default:
+      content[i] = 0;
     }
     i++;
     curChar = fgetc(file);

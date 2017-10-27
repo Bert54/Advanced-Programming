@@ -23,6 +23,6 @@ struct __case {
 
 int gameInit(char* fileName);
 void mainGame(int* entry);
-void gameGridFiller(int* entry, caseg gameGrid[20][20]);
+void gameGridFiller(int* entry, caseg gameGrid[20][20], int* nbSpawners);
 
 #endif

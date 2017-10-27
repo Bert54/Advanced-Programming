@@ -5,10 +5,6 @@
 #ifndef PROJ
 #define PROJ
 
-#include "SDL.h"
-#include "characters.h"
-#include "game.h"
-
 typedef struct __linkedListProjectile Projectile;
 
 struct __linkedListProjectile {
@@ -16,6 +12,8 @@ struct __linkedListProjectile {
   SDL_Rect position;
   SDL_Rect animation;
   int spriteRate;
+  int slow;
+  int slowCount;
   int velocity;
   int alliedTeam;
   int direction;
@@ -28,7 +26,11 @@ struct __linkedListFirstP {
   Projectile *first;
 };
 
-void consProjectile(Projectiles* projectile, int colorKey, player* player, int direction);
+#include "SDL.h"
+#include "characters.h"
+#include "game.h"
+
+void consProjectilePlayer(Projectiles* projectile, int colorKey, player* player, int direction, int alliedTeam, Enemy* enemy);
 void consEmptyProjectilesList(Projectiles* proj);
 void destroyProjectilesList(Projectiles* proj);
 void destroyProjectile(Projectiles* projectiles, int position);
