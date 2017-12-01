@@ -63,7 +63,7 @@ void consProjectilePlayer(Projectiles* projectile, int colorKey, player* player,
   }
   else {
     temp->velocity = 20;
-    temp->slow = 4;
+    temp->slow = 7;
     temp->slowCount = temp->slow;
   }
   temp->alliedTeam = alliedTeam;
@@ -88,7 +88,6 @@ void destroyProjectilesList(Projectiles* proj) {
     SDL_FreeSurface(proj->first->sprite);
     free(proj->first);
   }
-  free(proj);
 }
 
 void destroyProjectile(Projectiles* projectiles, int position) {

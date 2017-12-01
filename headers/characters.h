@@ -14,6 +14,7 @@ struct __linkedListEnemy {
   int health;
   int fireDelay;
   int curFireDelay;
+  int scoreValue;
   Enemy *next;
 };
 
@@ -48,6 +49,7 @@ struct __enemyCorpsesQueue {
 #define SPRITEDELAY 16
 
 void initPlayer (player* player, int* entry, int colorKey);
+void resetPlayer(player* player, int* entry);
 int playerCollision (player* player, caseg grid[20][20], int dir);
 void freePlayer(player* player);
 void consEmptyEnemyList(Enemies* enemies);
@@ -63,5 +65,6 @@ void checkDeadEnemies(Enemies* enemies, DeadEnemies* dEnemies, int colorKey);
 DeadEnemies initDeadQueue();
 void alterDeadQueue(DeadEnemies* dEnemies, Enemy* enemy, int colorKey);
 void updateDeadQueue(SDL_Surface* screen, DeadEnemies* dEnemies);
+void destroyDeadQueue(DeadEnemies* dEnemies);
 
 #endif

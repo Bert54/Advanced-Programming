@@ -3,7 +3,6 @@
 #include "headers/game.h"
 
 int main (int argc, char* argv[]) {
-  char* file = "content/entry/entry.txt";
-  gameInit(file);
+  mainMenu();
   return EXIT_SUCCESS;
 }

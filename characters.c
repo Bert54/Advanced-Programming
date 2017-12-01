@@ -56,6 +56,50 @@ void initPlayer (player* player, int* entry, int colorKey) {
   player->health = DEFAULT_HEALTH;
   player->fireDelay = DEFAULT_FIREDELAY;
   player->curFireDelay = 0;
+  player->score = 0;
+}
+
+void resetPlayer(player* player, int* entry) {
+  int i = 0, placed = 0;
+  player->health = DEFAULT_HEALTH;
+  player->size.x = 0;
+  player->size.y = 0;
+  player->position.x = 0;
+  player->position.y = 0;
+  player->fireDelay = DEFAULT_FIREDELAY;
+  player->curFireDelay = 0;
+  player->score = 0;
+  while (entry[i] != 3 && !placed) {
+    if (entry[i] == 4) {
+      placed = 1;
+    }
+    else if (entry[i] == 2) {
+      player->position.x = 0;
+      player->position.y += 50;
+    }
+    else {
+      player->position.x += 50;
+    }
+    i++;
+  }
+  if (!placed) {
+    i = 0;
+    player->position.x = 0;
+    player->position.y = 0;
+    while (entry[i] != 3 && !placed) {
+      if (entry[i] == 0) {
+	placed = 1;
+      }
+      else if (entry[i] == 2) {
+      player->position.x = 0;
+      player->position.y += 50;
+      }
+      else {
+	player->position.x += 50;
+      }
+      i++;
+    }
+  }
 }
 
 void freePlayer(player* player) {
@@ -123,7 +167,7 @@ void consEmptyEnemyList(Enemies* enemies) {
 
 void destroyEnemyList(Enemies* enemies) {
   Enemy *temp;
-   if (enemies->first != NULL) {
+  if (enemies->first != NULL) {
     while (enemies->first->next != NULL) {
       temp = enemies->first->next;
       SDL_FreeSurface(enemies->first->sprite);
@@ -133,7 +177,6 @@ void destroyEnemyList(Enemies* enemies) {
     SDL_FreeSurface(enemies->first->sprite);
     free(enemies->first);
   }
-  free(enemies);
 }
 
 void generateEnemy(Enemies* enemies, caseg grid[20][20], int spawnRate, int* nbEnemies, int colorKey) {
@@ -162,6 +205,7 @@ void generateEnemy(Enemies* enemies, caseg grid[20][20], int spawnRate, int* nbE
 	  temp->fireDelay = 250;
 	  temp->curFireDelay = 0;
 	  temp->next = enemies->first;
+	  temp->scoreValue = 100;
 	  enemies->first = temp;
 	  *nbEnemies++;
 	}
@@ -283,7 +327,7 @@ void enemyCollision(Enemy* enemy, caseg grid[20][20]) {
 }
 
 int playerInSight(Enemy* enemy, player* player) {
-  if (enemy->position.x + 20 > player->position.x && enemy->position.x + 20 < player->position.x + 30) {
+  if (enemy->position.x + 5 > player->position.x && enemy->position.x < player->position.x + 5) {
     if (enemy->position.y > player->position.y) {
       return 1;
     }
@@ -291,23 +335,7 @@ int playerInSight(Enemy* enemy, player* player) {
       return 3;
     }
   }
-  if (enemy->position.x + 30 > player->position.x + 20 && enemy->position.x + 40 < player->position.x + 40) {
-    if (enemy->position.y > player->position.y) {
-      return 1;
-    }
-    else {
-      return 3;
-    }
-  }
-  if (enemy->position.y + 20 > player->position.y && enemy->position.y + 20 < player->position.y + 30) {
-    if (enemy->position.x > player->position.x) {
-      return 4;
-    }
-    else {
-      return 2;
-    }
-  }
-  if (enemy->position.y + 35 > player->position.y && enemy->position.y + 35 < player->position.y + 35) {
+  if (enemy->position.y + 5 > player->position.y && enemy->position.y < player->position.y + 5) {
     if (enemy->position.x > player->position.x) {
       return 4;
     }
@@ -329,11 +357,12 @@ void projectileHit(Enemies* enemies, player* player, Projectiles* projectiles, D
       counterE = 0;
       hit = 0;
       while (!hit && tempE != NULL) {
-	if ((tempE->position.x+10 >= tempP->position.x && tempE->position.x+10 <= tempP->position.x+50 && tempE->position.y+10 >= tempP->position.y && tempE->position.y+10 <= tempP->position.y+50) || (tempE->position.x+40 >= tempP->position.x && tempE->position.x+40 <= tempP->position.x+50 && tempE->position.y+40 >= tempP->position.y && tempE->position.y+40 <= tempP->position.y+50) || (tempE->position.x+40 >= tempP->position.x && tempE->position.x+40 <= tempP->position.x+50 && tempE->position.y+10 >= tempP->position.y && tempE->position.y+10 <= tempP->position.y+50) || (tempE->position.x+10 >= tempP->position.x && tempE->position.x <= tempP->position.x+50 && tempE->position.y+40 >= tempP->position.y && tempE->position.y+40 <= tempP->position.y+50)) {
+	if ((tempE->position.x+10 >= tempP->position.x+10 && tempE->position.x+10 <= tempP->position.x+40 && tempE->position.y+10 >= tempP->position.y+10 && tempE->position.y+10 <= tempP->position.y+40) || (tempE->position.x+40 >= tempP->position.x+10 && tempE->position.x+40 <= tempP->position.x+40 && tempE->position.y+40 >= tempP->position.y+10 && tempE->position.y+40 <= tempP->position.y+40) || (tempE->position.x+40 >= tempP->position.x+10 && tempE->position.x+40 <= tempP->position.x+40 && tempE->position.y+10 >= tempP->position.y+10 && tempE->position.y+10 <= tempP->position.y+40) || (tempE->position.x+10 >= tempP->position.x+10 && tempE->position.x+40 <= tempP->position.x+40 && tempE->position.y+40 >= tempP->position.y+10 && tempE->position.y+40 <= tempP->position.y+40)) {
 	  tempE->health--;
 	  destroyProjectile(projectiles, counterP);
 	  if (tempE->health <= 0) {
 	    counterE--;
+	    player->score += 100;
 	  }
 	  counterP--;
 	  hit = 1;
@@ -343,8 +372,8 @@ void projectileHit(Enemies* enemies, player* player, Projectiles* projectiles, D
       }
     }
     else if (tempP->alliedTeam == 1) {
-      if ((player->position.x+10 >= tempP->position.x && player->position.x+10 <= tempP->position.x+50 && player->position.y+5 >= tempP->position.y && player->position.y+5 <= tempP->position.y+50) || (player->position.x+40 >= tempP->position.x && player->position.x+40 <= tempP->position.x+50 && player->position.y+45 >= tempP->position.y && player->position.y+45 <= tempP->position.y+50) || (player->position.x+40 >= tempP->position.x && player->position.x+40 <= tempP->position.x+50 && player->position.y+5 >= tempP->position.y && player->position.y+5 <= tempP->position.y+50) || (player->position.x+10 >= tempP->position.x && player->position.x+10 <= tempP->position.x+50 && player->position.y+45 >= tempP->position.y && player->position.y+45 <= tempP->position.y+50)) {
-	player->health -= 1;
+      if ((player->position.x >= tempP->position.x && player->position.x <= tempP->position.x+15 && player->position.y >= tempP->position.y && player->position.y <= tempP->position.y+20) || (player->position.x+35 >= tempP->position.x && player->position.x <= tempP->position.x && player->position.y+45 >= tempP->position.y && player->position.y <= tempP->position.y) || (player->position.x+40 >= tempP->position.x+10 && player->position.x+40 <= tempP->position.x+40 && player->position.y+10 >= tempP->position.y+10 && player->position.y+10 <= tempP->position.y+40) || (player->position.x >= tempP->position.x && player->position.x <= tempP->position.x+15 && player->position.y+45 >= tempP->position.y+5 && player->position.y <= tempP->position.y)) {
+	player->health--;
 	destroyProjectile(projectiles, counterP);
 	counterP--;
       }
@@ -416,7 +445,7 @@ void checkDeadEnemies(Enemies* enemies, DeadEnemies* dEnemies, int colorKey) {
 DeadEnemies initDeadQueue() {
   DeadEnemies dEnemies;
   dEnemies.number = malloc(CORPSES_LIMIT * sizeof(DeadEnemy));
-  dEnemies.start = 0;
+  dEnemies.start = CORPSES_LIMIT;
   dEnemies.end = 0;
   dEnemies.empty = 1;
   return dEnemies;
@@ -490,3 +519,24 @@ void updateDeadQueue(SDL_Surface* screen, DeadEnemies* dEnemies) {
   }
 }
 
+void destroyDeadQueue(DeadEnemies* dEnemies) {
+  int counter = 0;
+  if (!dEnemies->empty) {
+    if (dEnemies->start == dEnemies->end) {
+      while (counter < CORPSES_LIMIT-1) {
+	SDL_FreeSurface(dEnemies->number[counter].sprite);
+	counter++;
+      }
+    }
+    else {
+      while (dEnemies->start != dEnemies->end) {
+	if (dEnemies->start >= CORPSES_LIMIT) {
+	  dEnemies->start = 0;
+	}
+	SDL_FreeSurface(dEnemies->number[counter].sprite);
+	dEnemies->start++;
+      }
+    }
+  }
+  free(dEnemies->number);
+}

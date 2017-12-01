@@ -5,39 +5,94 @@
 #include "headers/game.h"
 #include "headers/characters.h"
 #include "headers/projectiles.h"
+#include "headers/menus.h"
+#define PAUSE_DELAY_EN 10
+#define PAUSE_DELAY_DI 90
 
-void eventManager(SDL_Event event, int *mainScreen, player* player, caseg grid[20][20], Projectiles* projectiles, int colorKey){
+void eventManager(SDL_Event event, int *mainScreen, player* player, caseg grid[20][20], Projectiles* projectiles, int colorKey, int* gameOverDelay, Enemies* enemies, int* entry, int* pause, int* pauseDelay, menuCursor* pauseCursor){
   Uint8 *keystates = SDL_GetKeyState(NULL);
   if (event.type == SDL_QUIT) {
     eventQuit(mainScreen);
   }
-  if (keystates[SDLK_ESCAPE]) {
-      eventQuit(mainScreen);
+  if (*pauseDelay == 0 && keystates[SDLK_ESCAPE]) {
+    if (*pause == 0) {
+      *pause = 1;
+      *pauseDelay = PAUSE_DELAY_EN;
+    }
+    else {
+      *pause = 0;
+      *pauseDelay = PAUSE_DELAY_DI;
+    }
   }
-  if (player->health > 0 && keystates[SDLK_UP]) {
+  if (!*pause) {
+    if (player->health > 0 && keystates[SDLK_UP]) {
       eventPlayerMovement(player, 0, grid);
-  }
-  else if (player->health > 0 && keystates[SDLK_RIGHT]) {
+    }
+    else if (player->health > 0 && keystates[SDLK_RIGHT]) {
       eventPlayerMovement(player, 1, grid);
-  }
-  else if (player->health > 0 && keystates[SDLK_DOWN]) {
+    }
+    else if (player->health > 0 && keystates[SDLK_DOWN]) {
       eventPlayerMovement(player, 2, grid);
-  }
-  else if (player->health > 0 && keystates[SDLK_LEFT]) {
+    }
+    else if (player->health > 0 && keystates[SDLK_LEFT]) {
       eventPlayerMovement(player, 3, grid);
-  }
-  if (player->health > 0 && keystates[SDLK_SPACE] && player->curFireDelay == 0) {
-    consProjectilePlayer(projectiles, colorKey, player, player->size.y / 50, 0, NULL);
+    }
+    if (player->health > 0 && keystates[SDLK_SPACE] && player->curFireDelay == 0) {
+      consProjectilePlayer(projectiles, colorKey, player, player->size.y / 50, 0, NULL);
       player->curFireDelay = player->fireDelay;
+    }
+    if (*gameOverDelay <= 0 && keystates[SDLK_RETURN]) {
+      resetGame(projectiles, enemies, player, gameOverDelay, entry);
+    }
+    if (player->health > 0 && event.type == SDL_KEYUP) {
+      switch (event.key.keysym.sym) {
+      case SDLK_UP:
+      case SDLK_RIGHT:
+      case SDLK_DOWN:
+      case SDLK_LEFT:
+	resetPlayerSprite(player);
+	break;
+      }
+    }
   }
-  if (player->health > 0 && event.type == SDL_KEYUP) {
-    switch (event.key.keysym.sym) {
-    case SDLK_UP:
-    case SDLK_RIGHT:
-    case SDLK_DOWN:
-    case SDLK_LEFT:
-      resetPlayerSprite(player);
-      break;
+  else {
+    if (keystates[SDLK_UP]) {
+      pauseMenuMovement(pauseCursor, 2);
+    }
+    else if (keystates[SDLK_DOWN]) {
+      pauseMenuMovement(pauseCursor, 1);
+    }
+    if (keystates[SDLK_RETURN]) {
+      if (pauseCursor->valueCursor == 1) {
+      }
+      else if (pauseCursor->valueCursor == 2) {
+	resetGame(projectiles, enemies, player, gameOverDelay, entry);
+      }
+      else {
+	eventQuit(mainScreen);
+      }
+      *pause = 0;
+    }
+  }
+}
+
+void eventManagerMenu(SDL_Event event, int* mainMenu, menuCursor* mainCursor, int* startGame) {
+  Uint8 *keystates = SDL_GetKeyState(NULL);
+  if (event.type == SDL_QUIT) {
+    eventQuit(mainMenu);
+  }
+  if (keystates[SDLK_UP]) {
+    mainMenuMovement(mainCursor, 2);
+  }
+  else if (keystates[SDLK_DOWN]) {
+    mainMenuMovement(mainCursor, 1);
+  }
+  if (keystates[SDLK_RETURN]) {
+    if (mainCursor->valueCursor == 1) {
+      *startGame = 1;
+    }
+    else  {
+      eventQuit(mainMenu);
     }
   }
 }
