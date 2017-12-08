@@ -41,6 +41,7 @@ struct __enemyCorpsesQueue {
   int start;
   int end;
   int empty;
+  int full;
 };
 
 #include "SDL.h"

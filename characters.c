@@ -184,7 +184,7 @@ void generateEnemy(Enemies* enemies, caseg grid[20][20], int spawnRate, int* nbE
   for (i=0;i<20;i++) {
     for (j=0;j<20;j++) {
       if (grid[i][j].inaccesibble == 2) {
-	result = rand() % (10000 - spawnRate);
+	result = rand() % (12000 - spawnRate);
 	if (result == 1) {
 	  int position = rand() % 4;
 	  Enemy *temp = malloc(sizeof(Enemy));
@@ -201,13 +201,13 @@ void generateEnemy(Enemies* enemies, caseg grid[20][20], int spawnRate, int* nbE
 	  temp->speed = 0;
 	  temp->speedController = 2;
 	  temp->direction = position;
-	  temp->health = 5;
+	  temp->health = 3;
 	  temp->fireDelay = 250;
 	  temp->curFireDelay = 0;
 	  temp->next = enemies->first;
 	  temp->scoreValue = 100;
 	  enemies->first = temp;
-	  *nbEnemies++;
+	  *nbEnemies = *nbEnemies + 1;
 	}
       }
     }	
@@ -445,28 +445,35 @@ void checkDeadEnemies(Enemies* enemies, DeadEnemies* dEnemies, int colorKey) {
 DeadEnemies initDeadQueue() {
   DeadEnemies dEnemies;
   dEnemies.number = malloc(CORPSES_LIMIT * sizeof(DeadEnemy));
-  dEnemies.start = CORPSES_LIMIT;
+  dEnemies.start = 0;
   dEnemies.end = 0;
   dEnemies.empty = 1;
+  dEnemies.full = 0;
   return dEnemies;
 }
 
 void alterDeadQueue(DeadEnemies* dEnemies, Enemy* enemy, int colorKey) {
-  dEnemies->end++;
+  int noFree = 0;
+  dEnemies->end = dEnemies->end + 1;
   if (dEnemies->end == CORPSES_LIMIT) {
     dEnemies->end = 0;
+  }
+  if (dEnemies->start != dEnemies->end || (dEnemies->start == dEnemies->end && dEnemies->full == 0)) {
+    SDL_Surface* surfaceLoader = SDL_LoadBMP("content/character/enemy1.bmp");
+    dEnemies->number[dEnemies->end].sprite = SDL_DisplayFormat(surfaceLoader);
+    SDL_FreeSurface(surfaceLoader);
+    SDL_SetColorKey(dEnemies->number[dEnemies->end].sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorKey);
+    if (dEnemies->start == dEnemies->end && dEnemies->full == 0) {
+      dEnemies->full = 1;
+      noFree = 1;
+    }
+  }
+  if (dEnemies->full == 1 && noFree == 0) {
+    dEnemies->start++;
   }
   if (dEnemies->start == CORPSES_LIMIT) {
     dEnemies->start = 0;
   }
-  if (dEnemies->start == dEnemies->end) {
-    SDL_FreeSurface(dEnemies->number[dEnemies->end].sprite);
-    dEnemies->start++;
-  }
-  SDL_Surface* surfaceLoader = SDL_LoadBMP("content/character/enemy1.bmp");
-  dEnemies->number[dEnemies->end].sprite = SDL_DisplayFormat(surfaceLoader);
-  SDL_FreeSurface(surfaceLoader);
-  SDL_SetColorKey(dEnemies->number[dEnemies->end].sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorKey);
   dEnemies->number[dEnemies->end].position.x = enemy->position.x;
   dEnemies->number[dEnemies->end].position.y = enemy->position.y;
   dEnemies->number[dEnemies->end].animation.x = 0;
@@ -481,7 +488,7 @@ void alterDeadQueue(DeadEnemies* dEnemies, Enemy* enemy, int colorKey) {
 }
 
 void updateDeadQueue(SDL_Surface* screen, DeadEnemies* dEnemies) {
-  int start, end, counter;
+  int start, end, counter  = 0;
   if (dEnemies->start == dEnemies->end) {
     while (counter < CORPSES_LIMIT) {
       if (dEnemies->number[counter].animation.x < 150) {

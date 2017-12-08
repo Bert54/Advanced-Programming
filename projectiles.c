@@ -12,7 +12,7 @@ void consProjectilePlayer(Projectiles* projectile, int colorKey, player* player,
     surfaceLoader = SDL_LoadBMP("content/projectiles/alliedProjectile.bmp");
     switch (direction) {
     case 0:
-      temp->position.x = player->position.x + 50 - PROJECTILE_WIDTH - 5;
+      temp->position.x = player->position.x + 50 - PROJECTILE_WIDTH - 10;
       temp->position.y = player->position.y - PROJECTILE_HEIGHT;
       break;
     case 1:
@@ -20,7 +20,7 @@ void consProjectilePlayer(Projectiles* projectile, int colorKey, player* player,
       temp->position.y = player->position.y + 50 - PROJECTILE_HEIGHT - 15;
       break;
     case 2:
-      temp->position.x = player->position.x + 50 - PROJECTILE_WIDTH - 5;
+      temp->position.x = player->position.x + 50 - PROJECTILE_WIDTH - 10;
       temp->position.y = player->position.y + 50;
       break;
     case 3:
