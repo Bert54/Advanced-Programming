@@ -18,8 +18,8 @@ void initMainMenuCursor(menuCursor* cursor, int colorKey) {
   cursor->cursorWidth = MAIN_CURSOR_W;
   cursor->cursorHeight = MAIN_CURSOR_H;
   cursor->valueCursor = 1;
-  cursor->posCursor.x = 310;
-  cursor->posCursor.y = 615;
+  cursor->posCursor.x = 315;
+  cursor->posCursor.y = 440;
 }
 
 void displayPauseMenu(SDL_Surface* screen, menuCursor* pauseCursor) {
@@ -49,19 +49,19 @@ void displayGameOverMenu(SDL_Surface* screen, menuCursor* gameOverCursor, player
   posMenuSplash.x = (int)(WINDOW_WIDTH - PAUSE_SPLASH_SIZE_W) / 2;
   posMenuSplash.y = (int)(WINDOW_HEIGHT - PAUSE_SPLASH_SIZE_H) / 2;
   if (player.score < 100) {
-    posScore.x = posMenuSplash.x + 140;
+    posScore.x = posMenuSplash.x + 134;
   }
   else if (player.score < 1000) {
-    posScore.x = posMenuSplash.x + 118;
+    posScore.x = posMenuSplash.x + 112;
   }
   else if (player.score < 10000) {
-    posScore.x = posMenuSplash.x + 106;
+    posScore.x = posMenuSplash.x + 100;
   }
   else if (player.score < 100000) {
-    posScore.x = posMenuSplash.x + 94;
+    posScore.x = posMenuSplash.x + 90;
   }
   else if (player.score < 1000000) {
-    posScore.x = posMenuSplash.x + 82;
+    posScore.x = posMenuSplash.x + 80;
   }
   else if (player.score < 10000000) {
     posScore.x = posMenuSplash.x + 70;
@@ -127,13 +127,21 @@ void pauseMenuMovement(menuCursor* cursor, int dir) {
 void mainMenuMovement(menuCursor* cursor, int dir) {
   if (dir == 1) {
     if (cursor->valueCursor == 1) {
-      cursor->posCursor.y = 775;
+      cursor->posCursor.y = 600;
       cursor->valueCursor = 2;
+    }
+    else if (cursor->valueCursor == 2) {
+      cursor->posCursor.y = 775;
+      cursor->valueCursor = 3;
     }
   }
   else {
-    if (cursor->valueCursor == 2) {
-      cursor->posCursor.y = 615;
+    if (cursor->valueCursor == 3) {
+      cursor->posCursor.y = 600;
+      cursor->valueCursor = 2;
+    }
+    else if (cursor->valueCursor == 2) {
+      cursor->posCursor.y = 440;
       cursor->valueCursor = 1;
     }
   }

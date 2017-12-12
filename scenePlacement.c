@@ -3,7 +3,7 @@
 #include "SDL.h"
 #define ENEMY_SPAWN_SIZE_WIDTH 50
 #define ENEMY_SPAWN_SIZE_HEIGHT 50
-#define ENEMY_SPAWN_ANIM_DELAY 35
+#define ENEMY_SPAWN_ANIM_DELAY 10
 #define ENEMY_SPAWN_NB_FRAMES 10
 
 void wallPlacement(int* entry, SDL_Surface screen, SDL_Surface wall, SDL_Rect posWall){

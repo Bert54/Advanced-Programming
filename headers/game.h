@@ -32,17 +32,21 @@ struct __stats {
   SDL_Rect posScore;
   SDL_Surface *health;
   SDL_Rect posHealth;
+  SDL_Surface *bestScore;
+  SDL_Rect posBestScore;
 };
 
 #include "characters.h"
 #include "projectiles.h"
+#include "scoresManager.h"
 
 int mainMenu();
 int gameInit(char* fileName, int colorKey, SDL_Surface *screen, int* mainMenu);
 void mainGame(int* entry, int colorKey, SDL_Surface* screen, int* mainMenu);
 void gameGridFiller(int* entry, caseg gameGrid[20][20], int* nbSpawners);
 void resetGame(Projectiles* projectiles, Enemies* enemies, player* player, int* gameOverDelay, int* entry);
-void updateStats(Stats* stats, SDL_Color statColor, SDL_Color lowHealthColor, TTF_Font *statFont, player player, int* lowHealthAnim, int* lowHealthCurColor);
+void updateStats(Stats* stats, SDL_Color statColor, SDL_Color lowHealthColor, TTF_Font *statFont, player player, int* lowHealthAnim, int* lowHealthCurColor, int bestScore);
 void displayStats(Stats stats, SDL_Surface* screen);
+void displayScoresMenu(SDL_Surface* screen, ScoreList scores);
 
 #endif

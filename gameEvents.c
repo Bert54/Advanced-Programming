@@ -95,23 +95,33 @@ void eventManager(SDL_Event event, int *mainScreen, player* player, caseg grid[2
   }
 }
 
-void eventManagerMenu(SDL_Event event, int* mainMenu, menuCursor* mainCursor, int* startGame) {
+void eventManagerMenu(SDL_Event event, int* mainMenu, menuCursor* mainCursor, int* startGame, int* scoreMenu) {
   Uint8 *keystates = SDL_GetKeyState(NULL);
   if (event.type == SDL_QUIT) {
     eventQuit(mainMenu);
   }
-  if (keystates[SDLK_UP]) {
-    mainMenuMovement(mainCursor, 2);
-  }
-  else if (keystates[SDLK_DOWN]) {
-    mainMenuMovement(mainCursor, 1);
-  }
-  if (keystates[SDLK_RETURN]) {
-    if (mainCursor->valueCursor == 1) {
-      *startGame = 1;
+  if (*scoreMenu == 0) {
+    if (keystates[SDLK_UP]) {
+      mainMenuMovement(mainCursor, 2);
     }
-    else  {
-      eventQuit(mainMenu);
+    else if (keystates[SDLK_DOWN]) {
+      mainMenuMovement(mainCursor, 1);
+    }
+    if (keystates[SDLK_RETURN]) {
+      if (mainCursor->valueCursor == 1) {
+	*startGame = 1;
+      }
+      else if (mainCursor->valueCursor == 2) {
+	*scoreMenu = 1;
+      }
+      else {
+	eventQuit(mainMenu);
+      }
+    }
+  }
+  else {
+    if (keystates[SDLK_RETURN]) {
+      *scoreMenu = 0;
     }
   }
 }
